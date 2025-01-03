@@ -23,8 +23,7 @@ const Chat = () => {
     });
 
     const { currentUser } = useUserStore();
-    const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
-        useChatStore();
+    const chatStore = useChatStore();
 
     const endRef = useRef(null);
 
@@ -33,14 +32,14 @@ const Chat = () => {
     }, [chat.messages]);
 
     useEffect(() => {
-        const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+        const unSub = onSnapshot(doc(db, "chats", chatStore.chatId), (res) => {
             setChat(res.data());
         });
 
         return () => {
             unSub();
         };
-    }, [chatId]);
+    }, [chatStore.chatId]);
 
     const handleEmoji = (e) => {
         setText((prev) => prev + e.emoji);
@@ -66,7 +65,7 @@ const Chat = () => {
             //     imgUrl = await upload(img.file);
             // }
 
-            await updateDoc(doc(db, "chats", chatId), {
+            await updateDoc(doc(db, "chats", chatStore.chatId), {
                 messages: arrayUnion({
                     senderId: currentUser.id,
                     text,
@@ -75,7 +74,7 @@ const Chat = () => {
                 }),
             });
 
-            const userIDs = [currentUser.id, user.id];
+            const userIDs = [currentUser.id, chatStore.user.id];
 
             userIDs.forEach(async (id) => {
                 const userChatsRef = doc(db, "userchats", id);
@@ -85,7 +84,7 @@ const Chat = () => {
                     const userChatsData = userChatsSnapshot.data();
 
                     const chatIndex = userChatsData.chats.findIndex(
-                        (c) => c.chatId === chatId
+                        (c) => c.chatId === chatStore.chatId
                     );
 
                     userChatsData.chats[chatIndex].lastMessage = text;
@@ -114,9 +113,12 @@ const Chat = () => {
         <div className="chat">
             <div className="top">
                 <div className="user">
-                    <img src={user?.avatar || "./avatar.png"} alt="" />
+                    <img
+                        src={chatStore.user?.avatar || "./avatar.png"}
+                        alt=""
+                    />
                     <div className="texts">
-                        <span>{user?.username}</span>
+                        <span>{chatStore.user?.username}</span>
                         <p>Lorem ipsum dolor, sit amet.</p>
                     </div>
                 </div>
@@ -169,13 +171,17 @@ const Chat = () => {
                 <input
                     type="text"
                     placeholder={
-                        isCurrentUserBlocked || isReceiverBlocked
+                        chatStore.isCurrentUserBlocked ||
+                        chatStore.isReceiverBlocked
                             ? "You cannot send a message"
                             : "Type a message..."
                     }
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    disabled={isCurrentUserBlocked || isReceiverBlocked}
+                    disabled={
+                        chatStore.isCurrentUserBlocked ||
+                        chatStore.isReceiverBlocked
+                    }
                 />
                 <div className="emoji">
                     <img
@@ -190,7 +196,10 @@ const Chat = () => {
                 <button
                     className="sendButton"
                     onClick={handleSend}
-                    disabled={isCurrentUserBlocked || isReceiverBlocked}
+                    disabled={
+                        chatStore.isCurrentUserBlocked ||
+                        chatStore.isReceiverBlocked
+                    }
                 >
                     Send
                 </button>
