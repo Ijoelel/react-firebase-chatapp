@@ -5,28 +5,21 @@ import { useUserStore } from "../../lib/userStore";
 import "./detail.css";
 
 const Detail = () => {
-    const {
-        chatId,
-        user,
-        isCurrentUserBlocked,
-        isReceiverBlocked,
-        changeBlock,
-        resetChat,
-    } = useChatStore();
+    const chatStore = useChatStore();
     const { currentUser } = useUserStore();
 
     const handleBlock = async () => {
-        if (!user) return;
+        if (!chatStore.user) return;
 
         const userDocRef = doc(db, "users", currentUser.id);
 
         try {
             await updateDoc(userDocRef, {
-                blocked: isReceiverBlocked
-                    ? arrayRemove(user.id)
-                    : arrayUnion(user.id),
+                blocked: chatStore.isReceiverBlocked
+                    ? arrayRemove(chatStore.user.id)
+                    : arrayUnion(chatStore.user.id),
             });
-            changeBlock();
+            chatStore.changeBlock();
         } catch (err) {
             console.log(err);
         }
@@ -34,14 +27,14 @@ const Detail = () => {
 
     const handleLogout = () => {
         auth.signOut();
-        resetChat();
+        chatStore.resetChat();
     };
 
     return (
         <div className="detail">
             <div className="user">
-                <img src={user?.avatar || "./avatar.png"} alt="" />
-                <h2>{user?.username}</h2>
+                <img src={chatStore.user?.avatar || "./avatar.png"} alt="" />
+                <h2>{chatStore.user?.username}</h2>
                 <p>Lorem ipsum dolor sit amet.</p>
             </div>
             <div className="info">
@@ -118,9 +111,9 @@ const Detail = () => {
                     </div>
                 </div>
                 <button onClick={handleBlock}>
-                    {isCurrentUserBlocked
+                    {chatStore.isCurrentUserBlocked
                         ? "You are Blocked!"
-                        : isReceiverBlocked
+                        : chatStore.isReceiverBlocked
                         ? "User blocked"
                         : "Block User"}
                 </button>
