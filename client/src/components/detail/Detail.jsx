@@ -5,14 +5,7 @@ import { useUserStore } from "../../lib/userStore";
 import "./detail.css";
 
 const Detail = () => {
-    const {
-        chatId,
-        user,
-        isCurrentUserBlocked,
-        isReceiverBlocked,
-        changeBlock,
-        resetChat,
-    } = useChatStore();
+    const { isReceiverBlocked, isCurrentUserBlocked, user, changeBlock, resetChat} = useChatStore();
     const { currentUser } = useUserStore();
 
     const handleBlock = async () => {

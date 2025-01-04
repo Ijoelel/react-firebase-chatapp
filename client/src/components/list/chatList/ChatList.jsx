@@ -12,7 +12,7 @@ const ChatList = () => {
     const [input, setInput] = useState("");
 
     const { currentUser } = useUserStore();
-    const { chatId, changeChat } = useChatStore();
+    const { changeChat } = useChatStore();
 
     useEffect(() => {
         const unSub = onSnapshot(
@@ -58,7 +58,7 @@ const ChatList = () => {
             await updateDoc(userChatsRef, {
                 chats: userChats,
             });
-            changeChat(chat.chatId, chat.user);
+            changeChat(chat.chatId, chat.user, currentUser);
         } catch (err) {
             console.log(err);
         }
