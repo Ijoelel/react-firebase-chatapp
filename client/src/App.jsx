@@ -4,10 +4,10 @@ import Detail from "./components/detail/Detail";
 import List from "./components/list/List";
 import Login from "./components/login/Login";
 import Notification from "./components/notification/Notification";
-import { auth } from "./lib/firebase";
-import { useChatStore } from "./lib/chatStore";
 import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
+import { useChatStore } from "./lib/chatStore";
 
 const App = () => {
     const { currentUser, isLoading, fetchUserInfo } = useUserStore();
@@ -40,4 +40,5 @@ const App = () => {
         </div>
     );
 };
+
 export default App;
